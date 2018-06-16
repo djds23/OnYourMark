@@ -18,7 +18,10 @@
 		7B33F09420CDE42900618D08 /* AddMarkViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B33F09320CDE42900618D08 /* AddMarkViewController.swift */; };
 		7B33F09620CDF17200618D08 /* MarkRecordType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B33F09520CDF17200618D08 /* MarkRecordType.swift */; };
 		7B33F09820CDF5CA00618D08 /* Mark.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B33F09720CDF5CA00618D08 /* Mark.swift */; };
-		7B33F09A20CE004B00618D08 /* ContentCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B33F09920CE004B00618D08 /* ContentCollectionViewCell.swift */; };
+		7BCAA6C920CE18E10022FC88 /* ContentCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BCAA6C720CE18E10022FC88 /* ContentCollectionViewCell.swift */; };
+		7BCAA6CA20CE18E10022FC88 /* ContentCollectionViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7BCAA6C820CE18E10022FC88 /* ContentCollectionViewCell.xib */; };
+		7BCAA6CC20CF69640022FC88 /* MarkFeedViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BCAA6CB20CF69640022FC88 /* MarkFeedViewController.swift */; };
+		7BCAA6CE20CF69CE0022FC88 /* Feed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BCAA6CD20CF69CE0022FC88 /* Feed.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -57,7 +60,10 @@
 		7B33F09320CDE42900618D08 /* AddMarkViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddMarkViewController.swift; sourceTree = "<group>"; };
 		7B33F09520CDF17200618D08 /* MarkRecordType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkRecordType.swift; sourceTree = "<group>"; };
 		7B33F09720CDF5CA00618D08 /* Mark.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mark.swift; sourceTree = "<group>"; };
-		7B33F09920CE004B00618D08 /* ContentCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentCollectionViewCell.swift; sourceTree = "<group>"; };
+		7BCAA6C720CE18E10022FC88 /* ContentCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentCollectionViewCell.swift; sourceTree = "<group>"; };
+		7BCAA6C820CE18E10022FC88 /* ContentCollectionViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ContentCollectionViewCell.xib; sourceTree = "<group>"; };
+		7BCAA6CB20CF69640022FC88 /* MarkFeedViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkFeedViewController.swift; sourceTree = "<group>"; };
+		7BCAA6CD20CF69CE0022FC88 /* Feed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Feed.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -112,6 +118,7 @@
 			children = (
 				7B33F08D20CDD91500618D08 /* OnYourMark.entitlements */,
 				7B33F05F20CDD90700618D08 /* AppDelegate.swift */,
+				7BCAA6CB20CF69640022FC88 /* MarkFeedViewController.swift */,
 				7B33F06120CDD90700618D08 /* MarksViewController.swift */,
 				7B33F06320CDD90700618D08 /* Main.storyboard */,
 				7B33F06620CDD90900618D08 /* Assets.xcassets */,
@@ -120,7 +127,9 @@
 				7B33F09320CDE42900618D08 /* AddMarkViewController.swift */,
 				7B33F09520CDF17200618D08 /* MarkRecordType.swift */,
 				7B33F09720CDF5CA00618D08 /* Mark.swift */,
-				7B33F09920CE004B00618D08 /* ContentCollectionViewCell.swift */,
+				7BCAA6C720CE18E10022FC88 /* ContentCollectionViewCell.swift */,
+				7BCAA6C820CE18E10022FC88 /* ContentCollectionViewCell.xib */,
+				7BCAA6CD20CF69CE0022FC88 /* Feed.swift */,
 			);
 			path = OnYourMark;
 			sourceTree = "<group>";
@@ -263,6 +272,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7BCAA6CA20CE18E10022FC88 /* ContentCollectionViewCell.xib in Resources */,
 				7B33F06A20CDD90900618D08 /* LaunchScreen.storyboard in Resources */,
 				7B33F06720CDD90900618D08 /* Assets.xcassets in Resources */,
 				7B33F06520CDD90700618D08 /* Main.storyboard in Resources */,
@@ -291,8 +301,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				7B33F06220CDD90700618D08 /* MarksViewController.swift in Sources */,
+				7BCAA6CE20CF69CE0022FC88 /* Feed.swift in Sources */,
 				7B33F06020CDD90700618D08 /* AppDelegate.swift in Sources */,
-				7B33F09A20CE004B00618D08 /* ContentCollectionViewCell.swift in Sources */,
+				7BCAA6C920CE18E10022FC88 /* ContentCollectionViewCell.swift in Sources */,
+				7BCAA6CC20CF69640022FC88 /* MarkFeedViewController.swift in Sources */,
 				7B33F09420CDE42900618D08 /* AddMarkViewController.swift in Sources */,
 				7B33F09620CDF17200618D08 /* MarkRecordType.swift in Sources */,
 				7B33F09820CDF5CA00618D08 /* Mark.swift in Sources */,

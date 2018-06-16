@@ -15,15 +15,38 @@ class Persitence {
   let encoder = JSONEncoder()
   let decoder = JSONDecoder()
   let database = CKContainer.default().privateCloudDatabase
+  var recordIDByMark = [Mark: CKRecordID]()
+  func delete(mark: Mark, with completion: @escaping (_ success: Bool) -> Void) {
+    guard let recordID = recordIDByMark[mark] else {
+      return
+    }
+    database.delete(withRecordID: recordID) { (_, error) in
+      if error == nil {
+        completion(true)
+      } else {
+        completion(false)
+      }
+    }
+  }
+
   func get(completion: @escaping ([Mark]) -> Void) {
-    let query = CKQuery(recordType: MarkRecordType.feed.asType(), predicate: NSPredicate(value: true))
+    let query = CKQuery(
+      recordType: MarkRecordType.feed.asType(),
+      predicate: NSPredicate(value: true)
+    )
+
     database.perform(query, inZoneWith: nil) { (records, error) in
       let marks = records?.compactMap({ (record) -> Mark? in
         guard let data = record.object(forKey: "payload") as? Data else {
           return nil
         }
-        return try? self.decoder.decode(Mark.self, from: data)
+        guard let mark = try? self.decoder.decode(Mark.self, from: data) else {
+          return nil
+        }
+        self.recordIDByMark[mark] = record.recordID
+        return mark
       })
+
       DispatchQueue.main.async {
         completion(marks ?? [])
       }
@@ -46,7 +69,7 @@ class Persitence {
   }
 }
 
-struct Mark: Codable {
+struct Mark: Codable, Hashable {
   let name: String
   let url: URL
 }

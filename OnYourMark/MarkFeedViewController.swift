@@ -1,17 +1,21 @@
 //
-//  MarksViewController.swift
+//  MarkFeedViewController.swift
 //  OnYourMark
 //
-//  Created by Dean Silfen on 6/10/18.
+//  Created by Dean Silfen on 6/11/18.
 //  Copyright © 2018 Dean Silfen. All rights reserved.
 //
 
 import UIKit
 
-
-class MarksViewController: UIViewController {
+class MarkFeedViewController: UIViewController {
   let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
-  var marks = [Mark]()
+  var mark: Mark? {
+    didSet {
+      feed = Feed()
+    }
+  }
+  var feed: Feed?
 
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -53,21 +57,21 @@ class MarksViewController: UIViewController {
       self.collectionView.reloadData()
     }
   }
-
+  
   @objc func handleRefresh(_ sender: Any?) {
     fetch()
   }
-
+  
   @objc func addMark(_ sender: Any?) {
-  navigationController?.pushViewController(AddMarkViewController(), animated: true)
+    navigationController?.pushViewController(AddMarkViewController(), animated: true)
   }
 }
 
-extension MarksViewController: UICollectionViewDataSource {
+extension MarkFeedViewController: UICollectionViewDataSource {
   func numberOfSections(in collectionView: UICollectionView) -> Int {
     return 1
   }
-
+  
   func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
     return marks.count
   }
@@ -81,7 +85,7 @@ extension MarksViewController: UICollectionViewDataSource {
   }
 }
 
-extension MarksViewController: UICollectionViewDelegateFlowLayout {
+extension MarkFeedViewController: UICollectionViewDelegateFlowLayout {
   func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
     return CGSize(width: view.frame.width, height: 60)
   }
