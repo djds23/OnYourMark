@@ -85,4 +85,11 @@ extension MarksViewController: UICollectionViewDelegateFlowLayout {
   func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
     return CGSize(width: view.frame.width, height: 60)
   }
+  
+  func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+    let feedViewController = FeedViewController(nibName: nil, bundle: nil)
+    let mark = marks[indexPath.row]
+    feedViewController.set(mark: mark)
+    navigationController?.pushViewController(feedViewController, animated: true)
+  }
 }

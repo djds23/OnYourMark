@@ -1,5 +1,5 @@
 //
-//  MarkFeedViewController.swift
+//  FeedViewController.swift
 //  OnYourMark
 //
 //  Created by Dean Silfen on 6/11/18.
@@ -7,26 +7,23 @@
 //
 
 import UIKit
+import SafariServices
+import RxSwift
 
-class MarkFeedViewController: UIViewController {
+class FeedViewController: UIViewController {
   let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
-  var mark: Mark? {
-    didSet {
-      feed = Feed()
-    }
+  var feedItems = [FeedItem]()
+  var feed = FeedViewModel()
+  func set(mark: Mark) {
+    feed.fetch(url: mark.url)
   }
-  var feed: Feed?
+  
+  var disposeBag = DisposeBag()
 
   override func viewDidLoad() {
     super.viewDidLoad()
     view.addSubview(collectionView)
-    let addMark = UIBarButtonItem(
-      barButtonSystemItem: .add,
-      target: self,
-      action: #selector(MarksViewController.addMark(_:))
-    )
-    navigationItem.title = "Marks"
-    navigationItem.rightBarButtonItems = [ addMark ]
+    navigationItem.title = "Feed"
     collectionView.translatesAutoresizingMaskIntoConstraints = false
     collectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
     collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
@@ -46,47 +43,65 @@ class MarkFeedViewController: UIViewController {
     collectionView.delegate = self
     collectionView.dataSource = self
     collectionView.backgroundColor = .clear
-    fetch()
+    view.backgroundColor = .white
+    listen()
   }
   
-  func fetch() {
-    collectionView.refreshControl?.beginRefreshing()
-    Persitence.default.get { newMarks in
-      self.marks = newMarks
-      self.collectionView.refreshControl?.endRefreshing()
-      self.collectionView.reloadData()
+  func listen() {
+    feed.state.subscribe { [weak self] (state) in
+      switch state {
+      case .next(let feedState):
+        self?.mapStateToFeedItems(feedState)
+      default:
+        self?.feedItems = []
+      }
+    }.disposed(by: disposeBag)
+  }
+  
+  func mapStateToFeedItems(_ feedState: FeedState) {
+    switch feedState {
+    case .none:
+      feedItems = []
+    case .feed(let items):
+      feedItems = items
     }
   }
-  
+
   @objc func handleRefresh(_ sender: Any?) {
-    fetch()
-  }
-  
-  @objc func addMark(_ sender: Any?) {
-    navigationController?.pushViewController(AddMarkViewController(), animated: true)
+    collectionView.refreshControl?.beginRefreshing()
+    collectionView.refreshControl?.endRefreshing()
+    collectionView.reloadData()
   }
 }
 
-extension MarkFeedViewController: UICollectionViewDataSource {
+extension FeedViewController: UICollectionViewDataSource {
   func numberOfSections(in collectionView: UICollectionView) -> Int {
     return 1
   }
   
   func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-    return marks.count
+    return feedItems.count
   }
   
   func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
     let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "ContentCollectionViewCell", for: indexPath) as? ContentCollectionViewCell ?? ContentCollectionViewCell()
-    let mark = marks[indexPath.row]
-    cell.titleText = "\(mark.name) \(indexPath.row)"
-    cell.subtitleText = mark.url.absoluteString
+    let item = feedItems[indexPath.row]
+    cell.titleText = item.title
+    cell.subtitleText = item.url.absoluteString
     return cell
   }
 }
 
-extension MarkFeedViewController: UICollectionViewDelegateFlowLayout {
+extension FeedViewController: UICollectionViewDelegateFlowLayout {
   func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
     return CGSize(width: view.frame.width, height: 60)
+  }
+  
+  func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+    let item = feedItems[indexPath.row]
+    let config = SFSafariViewController.Configuration()
+    config.entersReaderIfAvailable = true
+    let viewController = SFSafariViewController(url: item.url, configuration: config)
+    present(viewController, animated: true, completion: nil)
   }
 }
