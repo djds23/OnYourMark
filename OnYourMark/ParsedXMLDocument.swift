@@ -8,11 +8,19 @@
 
 import UIKit
 
-
 typealias ParsedXMLDocumentCompletion = () -> Void
 
 protocol ParsedXMLDocumentDelegate: class {
-  func parsedXMLDocument(didUpdate document: XMLElement)
+  func parsedXMLDocument(didUpdate document: FrozenElement)
+}
+
+protocol FrozenElement: Codable {
+  var children: [FrozenElement] { get }
+  var name: String? { get }
+  var body: String? { get }
+  var attributes: [String: String] { get }
+  func findChildBy(name: String) -> FrozenElement?
+  func findChildrenBy(names: [String]) -> [FrozenElement]
 }
 
 class ParsedXMLDocument {
@@ -37,8 +45,8 @@ class ParsedXMLDocument {
   }
 }
 
-class XMLElement: NSObject {
-  var children: [XMLElement] = []
+class XMLElement: NSObject, FrozenElement {
+  var children: [FrozenElement] = []
   var name: String?
   var body: String?
   var attributes: [String: String] = [:]
@@ -46,8 +54,8 @@ class XMLElement: NSObject {
   var parser: XMLParser?
   var completionBlock: ParsedXMLDocumentCompletion?
   
-  func findChildBy(name: String) -> XMLElement? {
-    var foundElement: XMLElement? = nil
+  func findChildBy(name: String) -> FrozenElement? {
+    var foundElement: FrozenElement? = nil
     for element in children {
       if element.name == name {
         foundElement = element
@@ -59,8 +67,8 @@ class XMLElement: NSObject {
     return foundElement
   }
 
-  func findChildrenBy(names: [String]) -> [XMLElement] {
-    var foundElements = [XMLElement]()
+  func findChildrenBy(names: [String]) -> [FrozenElement] {
+    var foundElements = [FrozenElement]()
     for element in children {
       if let name = element.name {
         if names.index(of: name) != nil {
@@ -71,6 +79,35 @@ class XMLElement: NSObject {
       }
     }
     return foundElements
+  }
+  
+  override init() {}
+
+  enum CodingKeys: String, CodingKey {
+    case children
+    case name
+    case body
+    case attributes
+  }
+  
+  required init(from decoder: Decoder) throws {
+    let values = try decoder.container(keyedBy: CodingKeys.self)
+    name = try values.decodeIfPresent(String.self, forKey: .name)
+    body = try values.decodeIfPresent(String.self, forKey: .body)
+    attributes = try values.decode([String: String].self, forKey: .attributes)
+    children = try values.decode([XMLElement].self, forKey: .children)
+  }
+  
+  func encode(to encoder: Encoder) throws {
+    guard let concreteChildren = children as? [XMLElement] else {
+      let context = EncodingError.Context(codingPath: [CodingKeys.children], debugDescription: "Class is not castable to concrete element.")
+      throw EncodingError.invalidValue(children, context)
+    }
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encodeIfPresent(name, forKey: .name)
+    try container.encodeIfPresent(body, forKey: .body)
+    try container.encode(attributes, forKey: .attributes)
+    try container.encode(concreteChildren, forKey: .children)
   }
 }
 

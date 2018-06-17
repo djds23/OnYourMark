@@ -6,6 +6,7 @@ target 'OnYourMark' do
 
   pod 'RxSwift',    '~> 4.0'
   pod 'RxCocoa',    '~> 4.0'
+  pod 'RxGesture',  '~> 1.2.1'
 
   target 'OnYourMarkTests' do
     inherit! :search_paths

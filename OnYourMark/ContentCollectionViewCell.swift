@@ -17,6 +17,8 @@ class ContentCollectionViewCell: UICollectionViewCell {
     return identifier
   }
 
+  @IBOutlet weak var moreStackView: UIStackView!
+
   var titleText: String? {
     didSet {
       if titleLabel != nil {
@@ -47,9 +49,4 @@ class ContentCollectionViewCell: UICollectionViewCell {
       }
     }
   }
-  override func awakeFromNib() {
-        super.awakeFromNib()
-        // Initialization code
-    }
-
 }

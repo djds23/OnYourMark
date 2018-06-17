@@ -12,12 +12,18 @@ import RxSwift
 
 class FeedViewController: UIViewController {
   let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
-  var feedItems = [FeedItem]()
+  var feedItems = [FeedItem]() {
+    didSet {
+      DispatchQueue.main.async {
+        self.collectionView.reloadData()
+      }
+    }
+  }
+
   var feed = FeedViewModel()
   func set(mark: Mark) {
     feed.fetch(url: mark.url)
   }
-  
   var disposeBag = DisposeBag()
 
   override func viewDidLoad() {

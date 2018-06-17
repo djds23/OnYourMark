@@ -19,7 +19,7 @@ struct FeedItem {
   let url: URL
 }
 
-func parsedFeed(document: XMLElement?) -> [FeedItem]? {
+func parsedFeed(document: FrozenElement?) -> [FeedItem]? {
   return document?.findChildrenBy(names: ["item", "entry"]).compactMap({ (child) -> FeedItem? in
 
     guard let titleElement = child.findChildBy(name: "title") else {
@@ -38,7 +38,7 @@ func parsedFeed(document: XMLElement?) -> [FeedItem]? {
   })
 }
 
-func urlFor(link: XMLElement) -> URL? {
+func urlFor(link: FrozenElement) -> URL? {
   let url: URL?
   if let body = link.body {
     url = URL(string: body)
@@ -55,7 +55,7 @@ class FeedViewModel {
     return subject.asObservable()
   }
   private var parsedDocument: ParsedXMLDocument?
-  private var document: XMLElement? {
+  private var document: FrozenElement? {
     didSet {
       if let feed = parsedFeed(document: document) {
         subject.onNext(.feed(feed))
@@ -68,16 +68,19 @@ class FeedViewModel {
 
   func fetch(url: URL) {
     if parsedDocument == nil {
-      let parser = XMLParser(contentsOf: url)
-      parsedDocument = ParsedXMLDocument(parser: parser)
-      parsedDocument?.delegate = self
-      parsedDocument?.parse()
+      DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        guard let strongSelf = self else { return }
+        let parser = XMLParser(contentsOf: url)
+        strongSelf.parsedDocument = ParsedXMLDocument(parser: parser)
+        strongSelf.parsedDocument?.delegate = strongSelf
+        strongSelf.parsedDocument?.parse()
+      }
     }
   }
 }
 
 extension FeedViewModel: ParsedXMLDocumentDelegate {
-  func parsedXMLDocument(didUpdate document: XMLElement) {
+  func parsedXMLDocument(didUpdate document: FrozenElement) {
     self.document = document
   }
 }

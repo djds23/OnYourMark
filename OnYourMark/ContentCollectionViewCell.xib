@@ -19,38 +19,45 @@
                 <rect key="frame" x="0.0" y="0.0" width="326" height="122"/>
                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                 <subviews>
-                    <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="FjX-5Y-sFT">
-                        <rect key="frame" x="10" y="10" width="306" height="102"/>
+                    <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="FjX-5Y-sFT" userLabel="Content Stack View">
+                        <rect key="frame" x="10" y="10" width="249" height="102"/>
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wNe-aE-ro2" userLabel="TitleLabel">
-                                <rect key="frame" x="0.0" y="0.0" width="306" height="20.5"/>
+                                <rect key="frame" x="0.0" y="0.0" width="249" height="20.5"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="J2V-YJ-wsj" userLabel="SubtitleLabel">
-                                <rect key="frame" x="0.0" y="20.5" width="306" height="14.5"/>
+                                <rect key="frame" x="0.0" y="20.5" width="249" height="14.5"/>
                                 <fontDescription key="fontDescription" style="UICTFontTextStyleCaption1"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="dvb-A3-r2y">
-                                <rect key="frame" x="0.0" y="35" width="306" height="67"/>
+                                <rect key="frame" x="0.0" y="35" width="249" height="67"/>
                             </view>
                         </subviews>
+                    </stackView>
+                    <stackView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="AOs-uA-4Em" userLabel="More Stack View">
+                        <rect key="frame" x="259" y="10" width="57" height="102"/>
                     </stackView>
                 </subviews>
             </view>
             <color key="backgroundColor" red="0.52567827339380524" green="0.58942573791150799" blue="1" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
             <constraints>
-                <constraint firstAttribute="trailing" secondItem="FjX-5Y-sFT" secondAttribute="trailing" constant="10" id="K1h-oH-Rob"/>
+                <constraint firstAttribute="trailing" secondItem="AOs-uA-4Em" secondAttribute="trailing" constant="10" id="GUP-RC-IMt"/>
                 <constraint firstItem="FjX-5Y-sFT" firstAttribute="top" secondItem="gTV-IL-0wX" secondAttribute="top" constant="10" id="Lzj-zR-5cl"/>
                 <constraint firstAttribute="bottom" secondItem="FjX-5Y-sFT" secondAttribute="bottom" constant="10" id="PoF-gk-yfH"/>
                 <constraint firstItem="FjX-5Y-sFT" firstAttribute="leading" secondItem="gTV-IL-0wX" secondAttribute="leading" constant="10" id="RQ1-wQ-K9i"/>
+                <constraint firstAttribute="bottom" secondItem="AOs-uA-4Em" secondAttribute="bottom" constant="10" id="RVB-90-a5w"/>
+                <constraint firstItem="AOs-uA-4Em" firstAttribute="top" secondItem="gTV-IL-0wX" secondAttribute="top" constant="10" id="YRq-5m-cEw"/>
+                <constraint firstItem="AOs-uA-4Em" firstAttribute="leading" secondItem="FjX-5Y-sFT" secondAttribute="trailing" id="ada-Hz-EIi"/>
             </constraints>
             <viewLayoutGuide key="safeArea" id="ZTg-uK-7eu"/>
             <size key="customSize" width="326" height="122"/>
             <connections>
+                <outlet property="moreStackView" destination="AOs-uA-4Em" id="7gk-L4-C0R"/>
                 <outlet property="subtitleLabel" destination="J2V-YJ-wsj" id="LxG-af-O7d"/>
                 <outlet property="titleLabel" destination="wNe-aE-ro2" id="hHd-KZ-7IN"/>
             </connections>

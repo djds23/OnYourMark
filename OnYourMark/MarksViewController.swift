@@ -7,12 +7,13 @@
 //
 
 import UIKit
-
+import RxSwift
+import RxCocoa
 
 class MarksViewController: UIViewController {
   let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
   var marks = [Mark]()
-
+  var disposeBag = DisposeBag()
   override func viewDidLoad() {
     super.viewDidLoad()
     view.addSubview(collectionView)
@@ -74,9 +75,17 @@ extension MarksViewController: UICollectionViewDataSource {
   
   func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
     let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "ContentCollectionViewCell", for: indexPath) as? ContentCollectionViewCell ?? ContentCollectionViewCell()
+    cell.backgroundColor = .white
     let mark = marks[indexPath.row]
     cell.titleText = "\(mark.name) \(indexPath.row)"
     cell.subtitleText = mark.url.absoluteString
+    if cell.moreStackView.arrangedSubviews.count == 0 {
+      let moreButton = UIButton(type: .detailDisclosure)
+      moreButton.rx.tap.asObservable().subscribe(onNext: { (tap) in
+        print("tapp that")
+      }).disposed(by: disposeBag)
+      cell.moreStackView.addArrangedSubview(moreButton)
+    }
     return cell
   }
 }
