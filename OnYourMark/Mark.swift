@@ -10,6 +10,10 @@ import UIKit
 import CloudKit
 
 class Persitence {
+  enum Get {
+    case error
+    case success([Mark])
+  }
   static var `default` = Persitence.init()
 
   let encoder = JSONEncoder()
@@ -29,7 +33,7 @@ class Persitence {
     }
   }
 
-  func get(completion: @escaping ([Mark]) -> Void) {
+  func get(completion: @escaping (Get) -> Void) {
     let query = CKQuery(
       recordType: MarkRecordType.feed.asType(),
       predicate: NSPredicate(value: true)
@@ -48,7 +52,11 @@ class Persitence {
       })
 
       DispatchQueue.main.async {
-        completion(marks ?? [])
+        if let marks = marks {
+          completion(.success(marks))
+        } else {
+          completion(.error)
+        }
       }
     }
   }

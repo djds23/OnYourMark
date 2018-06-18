@@ -12,7 +12,13 @@ import RxCocoa
 
 class MarksViewController: UIViewController {
   let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
-  var marks = [Mark]()
+  var marks = [Mark]() {
+    didSet {
+      DispatchQueue.main.async {
+        self.collectionView.reloadData()
+      }
+    }
+  }
   var disposeBag = DisposeBag()
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -48,10 +54,14 @@ class MarksViewController: UIViewController {
   
   func fetch() {
     collectionView.refreshControl?.beginRefreshing()
-    Persitence.default.get { newMarks in
-      self.marks = newMarks
-      self.collectionView.refreshControl?.endRefreshing()
-      self.collectionView.reloadData()
+    Persitence.default.get { [weak self] getOperation in
+      switch getOperation {
+      case .success(let marks):
+        self?.marks = marks
+      case .error:
+        break
+      }
+      self?.collectionView.refreshControl?.endRefreshing()
     }
   }
 
@@ -96,9 +106,8 @@ extension MarksViewController: UICollectionViewDelegateFlowLayout {
   }
   
   func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-    let feedViewController = FeedViewController(nibName: nil, bundle: nil)
     let mark = marks[indexPath.row]
-    feedViewController.set(mark: mark)
+    let feedViewController = FeedViewController(mark: mark)
     navigationController?.pushViewController(feedViewController, animated: true)
   }
 }

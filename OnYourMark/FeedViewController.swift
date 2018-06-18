@@ -20,11 +20,21 @@ class FeedViewController: UIViewController {
     }
   }
 
-  var feed = FeedViewModel()
-  func set(mark: Mark) {
-    feed.fetch(url: mark.url)
+  required init(mark: Mark) {
+    self.mark = mark
+    viewModel = FeedViewModel(url: mark.url)
+    super.init(nibName: nil, bundle: nil)
+    viewModel.fetch()
   }
-  var disposeBag = DisposeBag()
+
+  @available(*, unavailable)
+  required init?(coder aDecoder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
+  
+  let viewModel: FeedViewModel
+  let mark: Mark
+  let disposeBag = DisposeBag()
 
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -54,7 +64,7 @@ class FeedViewController: UIViewController {
   }
   
   func listen() {
-    feed.state.subscribe { [weak self] (state) in
+    viewModel.state.subscribe { [weak self] (state) in
       switch state {
       case .next(let feedState):
         self?.mapStateToFeedItems(feedState)

@@ -8,10 +8,16 @@
 
 import UIKit
 
+enum XMLParseError: Error {
+  case failedWhileParsingError
+  case nilParserError
+}
+
 typealias ParsedXMLDocumentCompletion = () -> Void
 
 protocol ParsedXMLDocumentDelegate: class {
   func parsedXMLDocument(didUpdate document: FrozenElement)
+  func parsedXMLDocument(error: XMLParseError)
 }
 
 protocol FrozenElement: Codable {
@@ -24,24 +30,31 @@ protocol FrozenElement: Codable {
 }
 
 class ParsedXMLDocument {
-  var document: XMLElement?
   let parser: XMLParser?
-  
   weak var delegate: ParsedXMLDocumentDelegate?
   init(parser: XMLParser?) {
     self.parser = parser
   }
   
   func parse() {
-    document = XMLElement()
-    document?.name = "root"
-    document?.parser = parser
-    document?.completionBlock = { [weak self] in
-      guard let doc = self?.document else { return }
-      self?.delegate?.parsedXMLDocument(didUpdate: doc)
+    guard let theParser = parser else {
+      self.delegate?.parsedXMLDocument(error: .nilParserError)
+      return
     }
-    parser?.delegate = document
-    parser?.parse()
+    let document = XMLElement()
+    document.name = "root"
+    document.parser = theParser
+    theParser.delegate = document
+
+    if !theParser.parse() {
+      self.delegate?.parsedXMLDocument(
+        error: .failedWhileParsingError
+      )
+    } else {
+      self.delegate?.parsedXMLDocument(
+        didUpdate: document
+      )
+    }
   }
 }
 
@@ -52,7 +65,6 @@ class XMLElement: NSObject, FrozenElement {
   var attributes: [String: String] = [:]
   var parent: XMLElement?
   var parser: XMLParser?
-  var completionBlock: ParsedXMLDocumentCompletion?
   
   func findChildBy(name: String) -> FrozenElement? {
     var foundElement: FrozenElement? = nil
@@ -131,10 +143,6 @@ extension XMLElement: XMLParserDelegate {
   
   func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
     parser.delegate = self.parent
-  }
-  
-  func parserDidEndDocument(_ parser: XMLParser) {
-    completionBlock?()
   }
 }
 
