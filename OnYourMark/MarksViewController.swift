@@ -89,14 +89,24 @@ extension MarksViewController: UICollectionViewDataSource {
     let mark = marks[indexPath.row]
     cell.titleText = "\(mark.name) \(indexPath.row)"
     cell.subtitleText = mark.url.absoluteString
-    if cell.moreStackView.arrangedSubviews.count == 0 {
-      let moreButton = UIButton(type: .detailDisclosure)
-      moreButton.rx.tap.asObservable().subscribe(onNext: { (tap) in
-        print("tapp that")
-      }).disposed(by: disposeBag)
-      cell.moreStackView.addArrangedSubview(moreButton)
-    }
     return cell
+  }
+  
+  func infoWasTappedFor(mark: Mark, indexPath: IndexPath) {
+    let alertController = UIAlertController(title: "Delete Mark", message: "Delete this mark from the CLOUD!", preferredStyle: .alert)
+    let delete = UIAlertAction(title: "Delete", style: .destructive) { _ in
+      Persitence.default.delete(mark: mark, with: { [weak self] completed in
+        if completed {
+          DispatchQueue.main.async {
+            self?.collectionView.reloadData()
+          }
+        }
+      })
+    }
+    let cancel = UIAlertAction(title: "Cancel", style: .default, handler: nil)
+    alertController.addAction(delete)
+    alertController.addAction(cancel)
+    present(alertController, animated: true, completion: nil)
   }
 }
 

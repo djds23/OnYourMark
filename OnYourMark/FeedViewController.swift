@@ -39,7 +39,7 @@ class FeedViewController: UIViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
     view.addSubview(collectionView)
-    navigationItem.title = "Feed"
+    navigationItem.title = mark.name
     collectionView.translatesAutoresizingMaskIntoConstraints = false
     collectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
     collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
@@ -115,9 +115,10 @@ extension FeedViewController: UICollectionViewDelegateFlowLayout {
   
   func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
     let item = feedItems[indexPath.row]
-    let config = SFSafariViewController.Configuration()
-    config.entersReaderIfAvailable = true
-    let viewController = SFSafariViewController(url: item.url, configuration: config)
-    present(viewController, animated: true, completion: nil)
+    let cellForIndex = collectionView.cellForItem(at: indexPath)
+    let activityViewController = UIActivityViewController(activityItems: [item.url], applicationActivities: nil)
+    activityViewController.popoverPresentationController?.sourceView = cellForIndex?.contentView
+    activityViewController.popoverPresentationController?.sourceRect = cellForIndex?.contentView.frame ?? .zero
+    present(activityViewController, animated: true, completion: nil)
   }
 }

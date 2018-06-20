@@ -110,8 +110,7 @@ class FeedCache {
   private var urlString: String {
     return url.absoluteString
   }
-
-  var path: String? {
+  private var path: String? {
     let paths = NSSearchPathForDirectoriesInDomains(FileManager.SearchPathDirectory.documentDirectory, FileManager.SearchPathDomainMask.userDomainMask, true)
     let documentsURL = NSURL(fileURLWithPath: paths.first!, isDirectory: true)
     let fullURL = documentsURL.appendingPathComponent("URL\(urlString.hashValue).xml")
