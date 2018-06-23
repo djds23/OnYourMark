@@ -10,7 +10,7 @@ import UIKit
 import RxSwift
 
 enum FeedState {
-  case none
+  case needsFetch
   case feed([FeedItem])
 }
 
@@ -68,7 +68,7 @@ class FeedViewModel {
       if let feed = parsedFeed(document: document) {
         subject.onNext(.feed(feed))
       } else {
-        subject.onNext(.none)
+        subject.onNext(.needsFetch)
       }
     }
   }
@@ -78,7 +78,7 @@ class FeedViewModel {
     feedCache = FeedCache(url: url)
   }
 
-  private let subject = BehaviorSubject<FeedState>(value: .none)
+  private let subject = BehaviorSubject<FeedState>(value: .needsFetch)
   func fetch() {
     queue.async { [weak self] in
       guard let strongSelf = self else { return }

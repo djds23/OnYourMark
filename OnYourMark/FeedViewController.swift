@@ -20,10 +20,10 @@ class FeedViewController: UIViewController {
     }
   }
 
-  required init(mark: Mark) {
-    self.mark = mark
-    viewModel = FeedViewModel(url: mark.url)
+  required init(viewModel: FeedViewModel, title: String) {
+    self.viewModel = viewModel
     super.init(nibName: nil, bundle: nil)
+    navigationItem.title = title
     viewModel.fetch()
   }
 
@@ -33,13 +33,11 @@ class FeedViewController: UIViewController {
   }
   
   let viewModel: FeedViewModel
-  let mark: Mark
   let disposeBag = DisposeBag()
 
   override func viewDidLoad() {
     super.viewDidLoad()
     view.addSubview(collectionView)
-    navigationItem.title = mark.name
     collectionView.translatesAutoresizingMaskIntoConstraints = false
     collectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
     collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
@@ -76,7 +74,7 @@ class FeedViewController: UIViewController {
   
   func mapStateToFeedItems(_ feedState: FeedState) {
     switch feedState {
-    case .none:
+    case .needsFetch:
       feedItems = []
     case .feed(let items):
       feedItems = items
@@ -110,7 +108,7 @@ extension FeedViewController: UICollectionViewDataSource {
 
 extension FeedViewController: UICollectionViewDelegateFlowLayout {
   func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-    return CGSize(width: view.frame.width, height: 60)
+    return CGSize(width: collectionView.bounds.width, height: 60)
   }
   
   func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {

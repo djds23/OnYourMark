@@ -117,7 +117,8 @@ extension MarksViewController: UICollectionViewDelegateFlowLayout {
   
   func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
     let mark = marks[indexPath.row]
-    let feedViewController = FeedViewController(mark: mark)
+    let viewModel = FeedViewModel(url: mark.url)
+    let feedViewController = FeedViewController(viewModel: viewModel, title: mark.name)
     navigationController?.pushViewController(feedViewController, animated: true)
   }
 }
