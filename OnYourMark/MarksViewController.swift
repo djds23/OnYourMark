@@ -10,8 +10,14 @@ import UIKit
 import RxSwift
 import RxCocoa
 
+protocol MarksViewControllerDelegate: class {
+  func marksViewController(_ marksViewController: MarksViewController, didSelect mark: Mark)
+  func marksViewControllerDidRequestNewMark(_ marksViewController: MarksViewController)
+}
+
 class MarksViewController: UIViewController {
   let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
+
   var marks = [Mark]() {
     didSet {
       DispatchQueue.main.async {
@@ -19,9 +25,36 @@ class MarksViewController: UIViewController {
       }
     }
   }
-  var disposeBag = DisposeBag()
+
+  var loading = false {
+    didSet {
+      DispatchQueue.main.async { [weak self] in
+        if (self?.loading ?? false) {
+          self?.collectionView.refreshControl?.beginRefreshing()
+        } else {
+          self?.collectionView.refreshControl?.endRefreshing()
+        }
+      }
+    }
+  }
+
+  let disposeBag = DisposeBag()
+  let viewModel: MarksViewModel
+  weak var delegate: MarksViewControllerDelegate?
+  
+  init(viewModel: MarksViewModel) {
+    self.viewModel = viewModel
+    super.init(nibName: nil, bundle: nil)
+  }
+
+  @available(*, unavailable)
+  required init?(coder aDecoder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
+
   override func viewDidLoad() {
     super.viewDidLoad()
+    view.backgroundColor = .white
     view.addSubview(collectionView)
     let addMark = UIBarButtonItem(
       barButtonSystemItem: .add,
@@ -49,20 +82,11 @@ class MarksViewController: UIViewController {
     collectionView.delegate = self
     collectionView.dataSource = self
     collectionView.backgroundColor = .clear
+    viewModel.marksObserable.subscribe(onNext: { [weak self] (marks) in
+      self?.marks = marks
+      self?.loading = false
+    }).disposed(by: disposeBag)
     fetch()
-  }
-  
-  func fetch() {
-    collectionView.refreshControl?.beginRefreshing()
-    Persitence.default.get { [weak self] getOperation in
-      switch getOperation {
-      case .success(let marks):
-        self?.marks = marks
-      case .error:
-        break
-      }
-      self?.collectionView.refreshControl?.endRefreshing()
-    }
   }
 
   @objc func handleRefresh(_ sender: Any?) {
@@ -70,7 +94,12 @@ class MarksViewController: UIViewController {
   }
 
   @objc func addMark(_ sender: Any?) {
-  navigationController?.pushViewController(AddMarkViewController(), animated: true)
+    delegate?.marksViewControllerDidRequestNewMark(self)
+  }
+  
+  func fetch() {
+    loading = true
+    viewModel.fetch()
   }
 }
 
@@ -91,23 +120,6 @@ extension MarksViewController: UICollectionViewDataSource {
     cell.subtitleText = mark.url.absoluteString
     return cell
   }
-  
-  func infoWasTappedFor(mark: Mark, indexPath: IndexPath) {
-    let alertController = UIAlertController(title: "Delete Mark", message: "Delete this mark from the CLOUD!", preferredStyle: .alert)
-    let delete = UIAlertAction(title: "Delete", style: .destructive) { _ in
-      Persitence.default.delete(mark: mark, with: { [weak self] completed in
-        if completed {
-          DispatchQueue.main.async {
-            self?.collectionView.reloadData()
-          }
-        }
-      })
-    }
-    let cancel = UIAlertAction(title: "Cancel", style: .default, handler: nil)
-    alertController.addAction(delete)
-    alertController.addAction(cancel)
-    present(alertController, animated: true, completion: nil)
-  }
 }
 
 extension MarksViewController: UICollectionViewDelegateFlowLayout {
@@ -117,8 +129,6 @@ extension MarksViewController: UICollectionViewDelegateFlowLayout {
   
   func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
     let mark = marks[indexPath.row]
-    let viewModel = FeedViewModel(url: mark.url)
-    let feedViewController = FeedViewController(viewModel: viewModel, title: mark.name)
-    navigationController?.pushViewController(feedViewController, animated: true)
+    delegate?.marksViewController(self, didSelect: mark)
   }
 }

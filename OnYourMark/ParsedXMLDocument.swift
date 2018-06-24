@@ -148,6 +148,6 @@ extension XMLElement: XMLParserDelegate {
 
 extension XMLElement {
   override var description: String {
-    return "<Element-\(name): \(body) \(children)>"
+    return "<Element-\(name ?? "NULL"): \(body ?? "NULL") \(children)>"
   }
 }

@@ -10,8 +10,27 @@ import UIKit
 import SafariServices
 import RxSwift
 
+protocol FeedViewControllerDelegate: class {
+  func feedViewController(_ feedViewController: FeedViewController, didRequestShareSheetFor feedItem: FeedItem, with sourceView: UIView?)
+}
+
 class FeedViewController: UIViewController {
+  weak var delegate: FeedViewControllerDelegate?
+  
   let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
+
+  var loading = false {
+    didSet {
+      DispatchQueue.main.async { [weak self] in
+        if (self?.loading ?? false) {
+          self?.collectionView.refreshControl?.beginRefreshing()
+        } else {
+          self?.collectionView.refreshControl?.endRefreshing()
+        }
+      }
+    }
+  }
+
   var feedItems = [FeedItem]() {
     didSet {
       DispatchQueue.main.async {
@@ -24,7 +43,6 @@ class FeedViewController: UIViewController {
     self.viewModel = viewModel
     super.init(nibName: nil, bundle: nil)
     navigationItem.title = title
-    viewModel.fetch()
   }
 
   @available(*, unavailable)
@@ -37,6 +55,7 @@ class FeedViewController: UIViewController {
 
   override func viewDidLoad() {
     super.viewDidLoad()
+    view.backgroundColor = .white
     view.addSubview(collectionView)
     collectionView.translatesAutoresizingMaskIntoConstraints = false
     collectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
@@ -57,12 +76,8 @@ class FeedViewController: UIViewController {
     collectionView.delegate = self
     collectionView.dataSource = self
     collectionView.backgroundColor = .clear
-    view.backgroundColor = .white
-    listen()
-  }
-  
-  func listen() {
     viewModel.state.subscribe { [weak self] (state) in
+      self?.loading = false
       switch state {
       case .next(let feedState):
         self?.mapStateToFeedItems(feedState)
@@ -70,6 +85,7 @@ class FeedViewController: UIViewController {
         self?.feedItems = []
       }
     }.disposed(by: disposeBag)
+    fetch()
   }
   
   func mapStateToFeedItems(_ feedState: FeedState) {
@@ -80,11 +96,14 @@ class FeedViewController: UIViewController {
       feedItems = items
     }
   }
+  
+  func fetch() {
+    loading = true
+    viewModel.fetch()
+  }
 
   @objc func handleRefresh(_ sender: Any?) {
-    collectionView.refreshControl?.beginRefreshing()
-    collectionView.refreshControl?.endRefreshing()
-    collectionView.reloadData()
+    fetch()
   }
 }
 
@@ -113,10 +132,7 @@ extension FeedViewController: UICollectionViewDelegateFlowLayout {
   
   func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
     let item = feedItems[indexPath.row]
-    let cellForIndex = collectionView.cellForItem(at: indexPath)
-    let activityViewController = UIActivityViewController(activityItems: [item.url], applicationActivities: nil)
-    activityViewController.popoverPresentationController?.sourceView = cellForIndex?.contentView
-    activityViewController.popoverPresentationController?.sourceRect = cellForIndex?.contentView.frame ?? .zero
-    present(activityViewController, animated: true, completion: nil)
+    let contentView = collectionView.cellForItem(at: indexPath)?.contentView
+    delegate?.feedViewController(self, didRequestShareSheetFor: item, with: contentView)
   }
 }
