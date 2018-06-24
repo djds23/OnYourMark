@@ -116,7 +116,7 @@ extension MarksViewController: UICollectionViewDataSource {
     let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "ContentCollectionViewCell", for: indexPath) as? ContentCollectionViewCell ?? ContentCollectionViewCell()
     cell.backgroundColor = .white
     let mark = marks[indexPath.row]
-    cell.titleText = "\(mark.name) \(indexPath.row)"
+    cell.titleText = mark.name
     cell.subtitleText = mark.url.absoluteString
     return cell
   }
