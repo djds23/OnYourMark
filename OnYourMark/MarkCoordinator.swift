@@ -14,7 +14,7 @@ protocol Coordinator {
 }
 
 class MarkCoordinator: NSObject, Coordinator {
-
+  private var feedViewModelByMark = [Mark: FeedViewModel]()
   let navController: UINavigationController
   init(navController: UINavigationController) {
     self.navController = navController
@@ -36,7 +36,13 @@ class MarkCoordinator: NSObject, Coordinator {
 
 extension MarkCoordinator: MarksViewControllerDelegate {
   func marksViewController(_ marksViewController: MarksViewController, didSelect mark: Mark) {
-    let viewModel = FeedViewModel(url: mark.url)
+    let viewModel: FeedViewModel
+    if let feedViewModel = feedViewModelByMark[mark] {
+      viewModel = feedViewModel
+    } else {
+      viewModel = FeedViewModel(url: mark.url)
+      feedViewModelByMark[mark] = viewModel
+    }
     let feedViewController = FeedViewController(viewModel: viewModel, title: mark.name)
     feedViewController.delegate = self
     navController.pushViewController(feedViewController, animated: true)
